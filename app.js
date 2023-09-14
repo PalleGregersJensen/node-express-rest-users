@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "fs/promises";
 import cors from "cors";
+import connection from "./database.js";
 
 const app = express();
 const port = process.env.PORT || 3333;
@@ -12,17 +13,34 @@ app.get("/", (request, response) => {
     response.send("Node.js Users REST API 🎉");
 });
 
+
 async function getUsersFromJSON() {
     const data = await fs.readFile("data.json");
     const users = JSON.parse(data);
     users.sort((userA, userB) => userA.name.localeCompare(userB.name));
     return users;
 }
+app.get("/users", (request, response) => {
+    const query = "SELECT * FROM users;";
+        connection.query(query, (error, results, fields) => {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log(results);
+                response.json(results);
+            }
+        }
+        )
+    });
+    // console.log(results); // results contains rows returned by server
+    //     console.log(fields); // fields contains extra meta data about results, if available
+
+
 
 // READ all users
-app.get("/users", async (request, response) => {
-    response.json(await getUsersFromJSON());
-});
+// app.get("/users", async (request, response) => {
+//     response.json(await getUsersFromJSON());
+// });
 
 // READ one user
 app.get("/users/:id", async (request, response) => {
