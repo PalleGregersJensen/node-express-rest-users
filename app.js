@@ -31,10 +31,9 @@ app.get("/users", (request, response) => {
             }
         }
         )
-    });
+});
     // console.log(results); // results contains rows returned by server
     //     console.log(fields); // fields contains extra meta data about results, if available
-
 
 
 // READ all users
@@ -42,13 +41,27 @@ app.get("/users", (request, response) => {
 //     response.json(await getUsersFromJSON());
 // });
 
+app.get("/users/:id", (request, response) => {
+    const id = request.params.id;
+    const query = "SELECT * FROM users WHERE UserId=?;"; //SQL Query
+    const values = [id];
+    connection.query(query, values, (error, results, fields) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(results);
+        response.json(results[0]);
+      }
+    });
+})
+
 // READ one user
-app.get("/users/:id", async (request, response) => {
-    const id = request.params.id; // tager id fra url'en, så det kan anvendes til at finde den givne bruger med "det" id.
-    const users = await getUsersFromJSON();
-    const user = users.find(user => user.id === id);
-    response.json(user);
-});
+// app.get("/users/:id", async (request, response) => {
+//     const id = request.params.id; // tager id fra url'en, så det kan anvendes til at finde den givne bruger med "det" id.
+//     const users = await getUsersFromJSON();
+//     const user = users.find(user => user.id === id);
+//     response.json(user);
+// });
 
 // CREATE user
 app.post("/users", async (request, response) => {
